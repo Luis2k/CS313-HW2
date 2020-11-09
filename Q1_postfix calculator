@@ -1,0 +1,275 @@
+//***********************************************************
+// Author: D.S. Malik
+//
+// Program: Postfix Calculator
+// This program evaluates postfix expressions.
+//***********************************************************
+
+//program reads input from file
+//Evaluates input to check for operations, checks if it is valid and then evaluates expression, writes to output file
+
+
+#include <iostream>
+#include <iomanip>
+#include <fstream>
+#include "mystack.h"
+
+using namespace std;
+
+//declartion of evaluateExpression function
+void evaluateExpression(ifstream& inpF, ofstream& outF,
+                        stackType<double>& stack,
+                        char& ch, bool& isExpOk);
+//declartion of evaluateOpr function
+void evaluateOpr(ofstream& out, stackType<double>& stack,
+                 char& ch, bool& isExpOk);
+//declartion of discardExp function
+void discardExp(ifstream& in, ofstream& out, char& ch);
+//declartion of printResult function
+void printResult(ofstream& outF, stackType<double>& stack,
+                 bool isExpOk);
+//main function
+int main()
+{
+    //bool true if expression is ok
+    bool expressionOk;
+    //character variable ch
+    char ch;
+    //initialize stack of double values with size of 100
+    stackType<double> stack(100);
+    //variable name for input stream from file
+    ifstream infile;
+    //variable name for output stream to file
+    ofstream outfile;
+    
+    //the input will stream from that text file
+    infile.open("RpnData.txt");
+    
+    //checks to see if file fails by overloading the ! operator
+    if (!infile)
+    {
+        //prints error message to user and ends program
+        cout << "Cannot open the input file. "
+        << "Program terminates!" << endl;
+        //terminates program
+        return 1;
+    }
+    //creates/opens text file to write into
+    outfile.open("RpnOutput.txt");
+    
+    //formats the output in the file
+    //a point/decimal-point-ish format that extends to the hundredth place
+    outfile << fixed << showpoint;
+    outfile << setprecision(2);
+    
+    //what streams from the text file will be converted to char
+    infile >> ch;
+    //while file is working
+    while (infile)
+    {
+        //stack calls a fucntion, initializeStack
+        stack.initializeStack();
+        //bool expression is set to true
+        expressionOk = true;
+        //writes to outfile ch
+        outfile << ch;
+        
+        //function evaluate expression is called with parameters infile, outfile, stack, ch and bool expressionOk
+        evaluateExpression(infile, outfile, stack, ch,
+                           expressionOk);
+        //function called passing the outfile, stack and expressionOk
+        printResult(outfile, stack, expressionOk);
+        //continues to next expression
+        infile >> ch; //begin processing the next expression
+    } //end while
+    
+    //closes ifstream
+    infile.close();
+    //closes outstream
+    outfile.close();
+    
+    return 0;
+    
+} //end main
+
+//void function called evaluateExpression
+void evaluateExpression(ifstream& inpF, ofstream& outF, stackType<double>& stack,char& ch, bool& isExpOk)
+{
+    //variable num of datatype double created
+    double num;
+    
+    //while the infile stream does not equal =
+    while (ch != '=')
+    {
+        //switch statement tests ch for
+        switch (ch)
+        {
+                //checks to see the ch from the text file stream is #
+            case '#':
+                //if it does equal to # then from the text file stream it will store it to variable num which is a datatype of double
+                inpF >> num;
+                //that number will be written to the output text file with a space after
+                outF << num << " ";
+                //if stack is not full then it will push num value to the stack
+                if (!stack.isFullStack())
+                    stack.push(num);
+                else
+                {
+                    //then if the stack is full it will print error message and end program
+                    cout << "Stack overflow. "
+                    << "Program terminates!" << endl;
+                    //ends program
+                    exit(0);  //terminate the program
+                }
+                
+                break;
+            default:
+                //if ch is not # then evaluateOpr is called passing output file, stack, ch and bool
+                evaluateOpr(outF, stack, ch, isExpOk);
+        }//end switch
+        
+        if (isExpOk) //if no error
+        {
+            //input from file will go to ch
+            inpF >> ch;
+            //ch will be written to output text file
+            outF << ch;
+            
+            //if the character from the input stream is not # then a space will be written to the output file
+            if (ch != '#')
+                outF << " ";
+        }
+        else
+            //if isExpOk is false then discardExp is called
+            discardExp(inpF, outF, ch);
+    } //end while (!= '=')
+} //end evaluateExpression
+
+
+void evaluateOpr(ofstream& out, stackType<double>& stack,
+                 char& ch, bool& isExpOk)
+{
+    //two variables with datatype double
+    double op1, op2;
+    
+    //if the stack is empty returns true
+    if (stack.isEmptyStack())
+    {
+        //message to user saying there is no enough operands
+        out << " (Not enough operands)";
+        //sets isExpressionOk to false
+        isExpOk = false;
+    }
+    //if it returns false
+    else
+    {
+        //op2's vaule is that of the top of the stack
+        op2 = stack.top();
+        //top of stack is removed
+        stack.pop();
+        
+        //if stack is empty and returns true
+        if (stack.isEmptyStack())
+        {
+            //prints error message
+            out << " (Not enough operands)";
+            //sets is expresion ok to false;
+            isExpOk = false;
+        }
+        else
+        {
+            //if stack is not empty op1's value is top of the stack
+            op1 = stack.top();
+            //removes element
+            stack.pop();
+            
+            //checks char to 4 different characters
+            switch (ch)
+            {
+                //tests to find if ch is +
+                case '+':
+                    //if ch is + then the number that goes into the stack will be the sum of op1 and op2
+                    stack.push(op1 + op2);
+                    break;
+                case '-':
+                    //if ch is - then the number that goes into the stack will be the difference of op1 and op2
+                    stack.push(op1 - op2);
+                    break;
+                case '*':
+                    //if ch is * then the number that goes into the stack will be the product of op1 and op2
+                    stack.push(op1 * op2);
+                    break;
+                case '/':
+                    //if ch is / then the number that goes into the stack will be the quotient of op1 and op2
+                    //checks to verify that the second number is not equal to 0
+                    if (op2 != 0)
+                        //if it is not then the quotient will be added to the stack
+                        stack.push(op1 / op2);
+                    else
+                    {
+                        //if op2 is not not equal 0 then message to user is displayed and expression check is set to false since division by 0
+                        out << " (Division by 0)";
+                        isExpOk = false;
+                    }
+                    break;
+                    //if ch is not either of those characters then message will be displayed
+                default:
+                    //no valid operator was found
+                    out << " (Illegal operator)";
+                    //sets expression check to false
+                    isExpOk = false;
+            }//end switch
+        } //end else
+    } //end else
+} //end evaluateOpr
+
+
+void discardExp(ifstream& in, ofstream& out, char& ch)
+{
+    //while ch does not eqaul to =
+    while (ch != '=')
+    {
+        //obtain the ch are not =
+        in.get(ch);
+        //writes to ch
+        out << ch;
+    }
+} //end discardExp
+
+void printResult(ofstream& outF, stackType<double>& stack,
+                 bool isExpOk)
+{
+    //variable of double datatype
+    double result;
+    
+    //checks to see if the expression is correct
+    if (isExpOk) //if no error, print the result
+    {
+        //if it returns false it means the stack is not empty and has elements in it
+        if (!stack.isEmptyStack())
+        {
+            //result will be the value of the top of the stack
+            result = stack.top();
+            //removes top element
+            stack.pop();
+            
+            //if the stack is empty
+            if (stack.isEmptyStack())
+                //writes to output file the number and ends line
+                outF << result << endl;
+            else
+                //if the stack is not empty then write to output file
+                outF << " (Error: Too many operands)" << endl;
+        } //end if
+        else
+            //if the stack is not not empty then write error to output file
+            outF << " (Error in the expression)" << endl;
+    }
+    else
+        //if isExpOk is not true then display user with error in the expression message
+        outF << " (Error in the expression)" << endl;
+    
+    //writes in file followed by two end of lines spaces
+    outF << "_________________________________"
+    << endl << endl;
+} //end printResult

@@ -1,0 +1,27 @@
+Question 8:
+Company X generally processes orders based on a first come, first serve basis.
+Sometimes a client will ask for rush processing and will be awarded a number based on the urgency. If they pay extra they will receive a 3 priority, if they have a bulk order they will receive a 2 priority, and if they know someone in the company and ask for a favor they will receive the highest priority, a 1. Design a system that accepts orders from clients and processes these orders based on no priority or somewhere on the priority scale. Show how the system will work for random orders with a random processing time.
+
+Q8():
+-priority queue 
+-a random order generator 
+-pushes order into queue
+-prints queue
+
+order class:
+-created to have a data type that stores name of the client, and priority
+-also assigns the priority level by using a switch statement
+	-p: If they pay extra they will receive a 3 priority
+	-b: if they have a bulk order they will receive a 2
+	-f: if they know someone in the company and ask for a favor they will 	    receive the highest priority, a 1
+	-n: no priority 
+-parameters are the characters that represent the priority and a name
+-has getName to return "name" of client
+-has getPriority to return priority
+
+operator<:
+-overloads operator in order to compare the order's priority levels and make sure the lowest number has the highest priority in the queue 
+
+orderGen():
+-used to create fake clients with different priority levels
+-these are then pushed into the queue

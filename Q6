@@ -1,0 +1,89 @@
+//
+//  main.cpp
+//  HW2_Q6
+//
+
+#include <iostream>
+#include <vector>
+#include <stack>
+#include <string>
+#include <fstream>
+using namespace std;
+
+//takes the stack with all the characters, the final string, the size of the word and the position of where the current letter
+void reverseword (stack <char> &word,string &str,int& size,int pos){
+    //j would be the first letter of the current word, pos is the index of the entire string and size would be the size of the word
+    for(int j =pos-size;j<pos;j++){
+            //character by character is added to the final string
+            str[j]=word.top();
+            //removes element to move to next character
+            word.pop();
+        //cout<<pos<<endl;
+        }
+    //the size of the word is reset back to 0
+    size =0;
+}
+
+string reverse(string str, int len){
+    
+    //final string copies the string
+    string finalString=str;
+    //size of the word
+    int letterCount=0;
+    //stack of char type
+    stack<char> word;
+    
+    //goes through the entire string
+    for(int i = 0; i <len; i++){
+        
+        //if a space, comma, period, or quotations is not the current char in the string
+        if(str[i]!=' '&&str[i]!=','&&str[i]!='.'&&str[i]!='"'){
+            //then the char will be pushed to the word stack
+            word.push(str[i]);
+            //each time a char is added the size of the word increases
+            letterCount++;
+        }
+        //if current char is space, comma, period or quotation
+        else if(str[i]==' '||str[i]==','||str[i]=='.'||str[i]!='"')
+            //once the word is finalize by either a separation, period, comma or quotation it reverses the word
+            //this is done to preverse word order
+            reverseword(word,finalString,letterCount,i);
+        //used to reverse the final word
+        if(i==len-1)
+            reverseword(word,finalString,letterCount,i+1);
+            //cout<<"end";
+    }
+    cout<<finalString<<endl;
+    //returns the final string
+    return finalString;
+}
+
+void Q6(){
+    
+    string str,c;
+    
+    ifstream inputFile;
+    inputFile.open("input.txt");
+    
+    ofstream outputFile;
+    outputFile.open("output.txt");
+    
+    //function that streams in from txt file
+    while(getline(inputFile,str))
+    {
+        //writes to an output file
+        //line by line is reversed
+        outputFile<<reverse(str,str.length())<<endl;
+    }
+    
+    //closes files
+    outputFile.close();
+    inputFile.close();
+    
+}
+
+int main() {
+    
+    Q6();
+    
+}

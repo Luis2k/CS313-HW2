@@ -1,0 +1,33 @@
+Question 6:
+Use a stack to pass in a string and reverse each word in the string. For instance, if you have the string 
+“​When Chuck Norris falls in water, Chuck Norris doesn't get wet. Water gets Chuck Norris.​” It should now say, 
+“​nehW kcuhC sirroN sllaf ni retaw, ...​” That is, it
+should take in one string and be a function (or multiple functions) that use a stack (or multiple stacks)
+to reverse each word in the sentence. Create a text file that you input of Chuck Norris jokes and have the 
+program reverse each of the jokes. [Here is some help if you want ot teg detracts.
+
+-read from input file
+-line by line, a string would be reversed however just the word not the whole string
+-using stack
+-writes to output file
+
+main()->Q6():
+-the input file is open as well as the output
+-using while loop to go through input file line by line
+-writes to output file the reverse of the string
+-closes output and input files
+
+reverse():
+-returns the string that will be written into the output file
+-this function goes through the entire string in the for loop
+-to group characters that form a word in the for loop it checks if the current character is a space, comma, period, quotation
+-while is there no such character then the other characters are pushed into the stack
+-once there is a separation between character it indicates a word
+-once this is determined in the else if statement, a function to reverse that word is called
+-the function is also called if it is the last word in the string 
+-returns the modified string 
+
+reverseword():
+-using the position of current character in string subtracted by the size of the word
+-the position of the first character is equal to the top of the stack
+-letter count of word is reset back to zero

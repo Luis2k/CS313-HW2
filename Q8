@@ -1,0 +1,134 @@
+//
+//  main.cpp
+//  HW2_Q8
+//
+
+#include <iostream>
+#include <set>
+#include <vector>
+#include <queue>
+#include <time.h>
+using namespace std;
+
+//An order is a class which could be defined by priority from a 4-1 (lowest to highest)
+//The name of the "client" for visiual output reasons
+//The certain level of priority would be derived from char(s) p,b and f. p:  If they pay
+//extra they will receive a 3 priority, b: if they have a bulk order they will receive a 2
+//priority, f: if they know someone in the company and ask for a favor they will receive the
+//highest priority, a 1
+
+//class order
+class order{
+private:
+    char priority;
+    int priorityNum;
+    string nam;
+public:
+    //Default constructor
+    order(){
+        priority=' ';
+        priorityNum=4;
+        nam="";
+    }
+    //order with name and priority
+    order(char prior, string name){
+        nam=name;
+        //checks priority and assigns value
+        switch(prior){
+            case 'n':
+                priorityNum=4;
+                break;
+            case 'p':
+                priorityNum=3;
+                break;
+            case 'b':
+                priorityNum=2;
+                break;
+            case 'f':
+                priorityNum=1;
+                break;
+            default:
+                priorityNum=4;
+        }
+
+    }
+    
+    //order with just name
+    order(string name){
+        nam=name;
+        priorityNum=4;
+        
+    }
+    
+    //returns order's priority number
+     int getPriority() const {
+        return priorityNum;
+    }
+    
+    //returns name
+    string getName() const{
+        return nam;
+    }
+
+};
+
+bool operator<( const order& p1, const order& p2)
+{
+    //operator overload to compare priorities levels
+    //the lowest number has more priority
+    return p1.getPriority() > p2.getPriority();
+}
+
+//function to generate random orders with random processing time (priority levels)
+void orderGen(vector<order>& a){
+    srand(time(NULL));
+    //n is "no priority", p is"paid", b is "bulk order" and f is "asked for favor"
+    char priority[]={'n','p','b','f'};
+    //used to create "name"
+    char letters[]="abcdefghijklmnopqrstuvwxyz";
+    //generate 10 random order
+    const int n = 10;
+    for(int i = 0; i <n;i++){
+        int r=rand()%4;
+        string name="";
+        name+=letters[rand()%26];
+        name+=",";
+        name+=letters[rand()%26];
+        //selects between the 4 priority levels and adds name
+        a.push_back(order(priority[r],name));
+    }
+}
+
+void Q8(){
+    
+    //processing Queue| Queue of orders
+    priority_queue<order> pOrd;
+    
+    //random order gen
+    vector <order> arr;
+    orderGen(arr);
+    
+    //insert all values to queue
+    for (int i = 0; i < arr.size(); i++) {
+        
+        //insert values to queue
+        pOrd.push(order(arr[i]));
+        
+    }
+
+    //printing queue
+    while(!pOrd.empty()) {
+
+        order p = pOrd.top();
+        //displays queue from highest priority to lowest (1 is the highest, 4 is the lowest) with "name"
+        cout<<p.getPriority()<<" "<<p.getName()<<endl;
+        //removes top element
+        pOrd.pop();
+    }
+    
+}
+
+int main(){
+    Q8();
+    return 0;
+}
